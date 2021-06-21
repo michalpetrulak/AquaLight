@@ -50,21 +50,6 @@ float Pwm3MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 
 float Pwm3EveningStart = 21.0*60*60L; // time when the "sunset starts" for channel 3 
 float Pwm3EveningEnd = 22*60*60L; // time when the "sunset ends" for channel 3 
 
-// ----------------------- Setup -----------------------
-void setup() {
- // serial interfce setup
-Serial.begin(9600);
-
-// pin setup
-pinMode(Pwm1Pin, OUTPUT);
-pinMode(Pwm2Pin, OUTPUT); 
-pinMode(Pwm3Pin, OUTPUT); 
-
-// RTC Clock setup 
-Wire.begin();
-DS1307.begin();
-//DS1307.adjust(DateTime(__DATE__, __TIME__));  // Set RTC time to sketch compilation time, only use for 1 (ONE) run. Will reset time at each device reset!
-
 //PWM calculations CHannel1
 float IncrementUpPwm1 = (Pwm1EveningEnd - Pwm1EveningStart)/(Pwm1maxInt - Pwm1minInt);
 float IncrementDownPwm1 = (Pwm1MorningEnd - Pwm1MorningStart)/(Pwm1maxInt - Pwm1minInt);
@@ -86,6 +71,21 @@ float pwm3SecFromMorningStart;
 float pwm3SecFromEveningStart;
 int Pwm3Val;
 
+// ----------------------- Setup -----------------------
+void setup() {
+ // serial interfce setup
+Serial.begin(9600);
+
+// pin setup
+pinMode(Pwm1Pin, OUTPUT);
+pinMode(Pwm2Pin, OUTPUT); 
+pinMode(Pwm3Pin, OUTPUT); 
+
+// RTC Clock setup 
+Wire.begin();
+DS1307.begin();
+//DS1307.adjust(DateTime(__DATE__, __TIME__));  // Set RTC time to sketch compilation time, only use for 1 (ONE) run. Will reset time at each device reset!
+
 }
 
 
@@ -99,86 +99,18 @@ void CalcSec();
 // prints values for debugging into serial port
 void PrintSerial();
 
+void SetPwm1Val();
 
-delay(delaytime);
+void SetPwm2Val();
 
+void SetPwm3Val();
 
+void MoonLightPwm1();
 
-//---------------------PWM Loop---------------------
-if (ledstate >=3){
-        ledstate2=ledstate;}
-if (ledstate < 3){
-        ledstate2 = 0;}
+void MoonLightPwm2();
 
+void MoonLightPwm3();
 
-if (totalsec <= morningstart) {
-        ledstate = dimendint;
-        analogWrite(Pwm1Pin, ledstate);
-        analogWrite(Pwm2Pin, ledstate);  // ledstate2
-        }
-    
-else if ((morningstart<totalsec)&&(totalsec<morningend)){
-        ledstate = (dimendint + (secfrommorningstart/incr));
-        analogWrite(Pwm1Pin, ledstate);
-        analogWrite(Pwm2Pin, ledstate);  // ledstate2
-        }
-    
-else if ((morningend <= totalsec)&&(totalsec < dimstart)){
-        ledstate = dimstartint;
-        analogWrite(Pwm1Pin, ledstate);
-        analogWrite(Pwm2Pin, ledstate);  // ledstate2
-        }
-    
-else if ((dimstart <= totalsec)&&(totalsec <= dimend)){
-        ledstate = (dimstartint - (secfromdimstart/incr));
-        analogWrite(Pwm1Pin, ledstate);
-        analogWrite(Pwm2Pin, ledstate);  // ledstate2
-        }
-    
-else {
-        ledstate = dimendint;
-        Serial.println ("to ti nejak nevychadza");
-        analogWrite(Pwm1Pin, ledstate);
-        analogWrite(Pwm2Pin, ledstate);  // ledstate2
-        }
-
-delay(delaytime);
-
-
-
-
-if (totalsec <= morningstartPwm3) {
-        ledstatePwm3 = dimendintPwm3;
-        analogWrite(Pwm3Pin, ledstatePwm3);
-        }
-    
-else if ((morningstartPwm3<totalsec)&&(totalsec<morningendPwm3)){
-        ledstatePwm3 = (dimendintPwm3 + (secfrommorningstartPwm3/incrPwm3));
-        analogWrite(Pwm3Pin, ledstatePwm3);
-        }
-    
-else if ((morningendPwm3 <= totalsec)&&(totalsec < dimstartPwm3)){
-        ledstatePwm3 = dimstartintPwm3;
-        analogWrite(Pwm3Pin, ledstatePwm3);
-        }
-    
-else if ((dimstartPwm3 <= totalsec)&&(totalsec <= dimendPwm3)){
-        ledstatePwm3 = (dimstartintPwm3 - (secfromdimstartPwm3/incrPwm3));
-        analogWrite(Pwm3Pin, ledstatePwm3);
-        }
-    
-else {
-        ledstatePwm3 = dimendintPwm3;
-        Serial.println ("to ti nejak nevychadza");
-        analogWrite(Pwm3Pin, ledstatePwm3);
-        }
-
-delay(delaytime);
-
-if (ledstatePwm3 < 3){
-        ledstatePwm3 = 0;}
-        
-delay(delaytime);
 
 
 
@@ -220,3 +152,130 @@ Serial.println (Pwm2Val);
 Serial.println (Pwm3Val);
 
 }
+
+
+
+// Channel 1 decision function
+void SetPwm1Val(){
+  
+if (totalsec <= Pwm1MorningStart) {
+        Pwm1Val = Pwm1minInt;
+        analogWrite(Pwm1Pin, Pwm1Val);
+        }
+    
+else if ((Pwm1MorningStart<totalsec)&&(totalsec<Pwm1MorningEnd)){
+        Pwm1Val = (Pwm1minInt + (pwm1SecFromMorningStart/IncrementUpPwm1));
+        analogWrite(Pwm1Pin, Pwm1Val);
+        }
+    
+else if ((Pwm1MorningEnd <= totalsec)&&(totalsec < Pwm1EveningStart)){
+        Pwm1Val = Pwm1maxInt;
+        analogWrite(Pwm1Pin, Pwm1Val);
+        }
+    
+else if ((Pwm1EveningStart <= totalsec)&&(totalsec <= Pwm1EveningEnd)){
+        Pwm1Val = (Pwm1maxInt - (pwm1SecFromEveningStart/IncrementDownPwm1));
+        analogWrite(Pwm1Pin, Pwm1Val);
+        }
+
+else {
+        Pwm1Val = Pwm1minInt;
+        analogWrite(Pwm1Pin, Pwm1Val);
+        }
+
+delay(delaytime);
+  
+  }
+
+  
+// Channel 2 decision function
+void SetPwm2Val(){
+  
+if (totalsec <= Pwm2MorningStart) {
+        Pwm2Val = Pwm2minInt;
+        analogWrite(Pwm2Pin, Pwm2Val);
+        }
+    
+else if ((Pwm2MorningStart<totalsec)&&(totalsec<Pwm2MorningEnd)){
+        Pwm2Val = (Pwm2minInt + (pwm2SecFromMorningStart/IncrementUpPwm2));
+        analogWrite(Pwm2Pin, Pwm2Val);
+        }
+    
+else if ((Pwm2MorningEnd <= totalsec)&&(totalsec < Pwm2EveningStart)){
+        Pwm2Val = Pwm2maxInt;
+        analogWrite(Pwm2Pin, Pwm2Val);
+        }
+    
+else if ((Pwm2EveningStart <= totalsec)&&(totalsec <= Pwm2EveningEnd)){
+        Pwm2Val = (Pwm2maxInt - (pwm2SecFromEveningStart/IncrementDownPwm2));
+        analogWrite(Pwm2Pin, Pwm2Val);
+        }
+
+else {
+        Pwm2Val = Pwm2minInt;
+        analogWrite(Pwm2Pin, Pwm2Val);
+        }
+
+delay(delaytime);
+  
+  }
+
+
+// Channel 3 decision function
+void SetPwm3Val(){
+  
+if (totalsec <= Pwm3MorningStart) {
+        Pwm3Val = Pwm3minInt;
+        analogWrite(Pwm3Pin, Pwm3Val);
+        }
+    
+else if ((Pwm3MorningStart<totalsec)&&(totalsec<Pwm3MorningEnd)){
+        Pwm3Val = (Pwm3minInt + (pwm3SecFromMorningStart/IncrementUpPwm3));
+        analogWrite(Pwm3Pin, Pwm3Val);
+        }
+    
+else if ((Pwm3MorningEnd <= totalsec)&&(totalsec < Pwm3EveningStart)){
+        Pwm3Val = Pwm3maxInt;
+        analogWrite(Pwm3Pin, Pwm3Val);
+        }
+    
+else if ((Pwm3EveningStart <= totalsec)&&(totalsec <= Pwm3EveningEnd)){
+        Pwm3Val = (Pwm3maxInt - (pwm3SecFromEveningStart/IncrementDownPwm3));
+        analogWrite(Pwm3Pin, Pwm3Val);
+        }
+
+else {
+        Pwm3Val = Pwm3minInt;
+        analogWrite(Pwm3Pin, Pwm3Val);
+        }
+
+delay(delaytime);
+  
+  }
+
+void MoonLightPwm1(){
+
+  if (Pwm1Val < 2){
+        Pwm1Val = 0;
+        analogWrite(Pwm1Pin, Pwm1Val);
+        }
+  
+  }
+
+void MoonLightPwm2(){
+
+  if (Pwm2Val < 2){
+        Pwm1Val = 0;
+        analogWrite(Pwm2Pin, Pwm2Val);
+        }
+  
+  }
+
+void MoonLightPwm3(){
+
+  if (Pwm3Val < 2){
+        Pwm3Val = 0;
+        analogWrite(Pwm3Pin, Pwm3Val);
+        }
+  
+  }
