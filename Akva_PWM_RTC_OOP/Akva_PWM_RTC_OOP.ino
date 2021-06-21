@@ -4,12 +4,12 @@
 RTC_DS1307 DS1307;
 DateTime CurrentTime;
 
-//change is change
 // define pins for output
-const int PwmPin = 10;  //not used 
-const int Pwm2Pin = 11; // 
-const int Pwm3Pin = 9;
+const int Pwm1Pin = 9;  //pwm pin for channel 1 
+const int Pwm2Pin = 10; //pwm pin for channel 2
+const int Pwm3Pin = 11; //pwm pin for channel 3
 
+int delaytime = 500;
 
 // define time variables
 int hours;
@@ -19,43 +19,36 @@ long hoursec;
 long minutesec;
 long secsec;
 long totalsec;
-int delaytime = 1000;
 
 ////////////////////////////PWM////////////////////////////
-// define PWM fader intensities
-int dimstartint = 160;
-int dimendint = 2;
+// define PWM CHannels min and max intensities (0-255)
 
-int dimstartintPwm3 = 100;
-int dimendintPwm3 = 2;
+int Pwm1maxInt = 160;
+int Pwm1minInt = 2;
 
+int Pwm2maxInt = 160;
+int Pwm2minInt = 2;
 
-// define PWM fader times
-float dimstart = 21.0*60*60L;
-float dimend = 22*60*60L;
-float morningstart = 11.5*60*60L;
-float morningend = 12.5*60*60L;
+int Pwm3maxInt = 160;
+int Pwm3minInt = 2;
 
 
-float dimstartPwm3 = 22.0*60*60L;
-float dimendPwm3 = 22.5*60*60L;
-float morningstartPwm3 = 14.0*60*60L;
-float morningendPwm3 = 14.5*60*60L;
+// define PWM Channels fading times, time is in seconds so just change the hour in 0-24 format
 
+float Pwm1MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 1 
+float Pwm1MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 1 
+float Pwm1EveningStart = 21.0*60*60L; // time when the "sunset starts" for channel 1 
+float Pwm1EveningEnd = 22*60*60L; // time when the "sunset ends" for channel 1 
 
-// define PWM primary calculations 
-float incr = (dimend - dimstart)/(dimstartint - dimendint);
-float secfromdimstart;
-float secfrommorningstart;
-int ledstate;
-int ledstate2=ledstate;
+float Pwm2MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 2 
+float Pwm2MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 2 
+float Pwm2EveningStart = 21.0*60*60L; // time when the "sunset starts" for channel 2 
+float Pwm2EveningEnd = 22*60*60L; // time when the "sunset ends" for channel 2 
 
-float incrPwm3 = (dimendPwm3 - dimstartPwm3)/(dimstartintPwm3 - dimendintPwm3);
-float secfromdimstartPwm3;
-float secfrommorningstartPwm3;
-int ledstatePwm3;
-
-
+float Pwm3MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 3 
+float Pwm3MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 3 
+float Pwm3EveningStart = 21.0*60*60L; // time when the "sunset starts" for channel 3 
+float Pwm3EveningEnd = 22*60*60L; // time when the "sunset ends" for channel 3 
 
 // ----------------------- Setup -----------------------
 void setup() {
@@ -63,15 +56,36 @@ void setup() {
 Serial.begin(9600);
 
 // pin setup
-pinMode(PwmPin, OUTPUT);
+pinMode(Pwm1Pin, OUTPUT);
 pinMode(Pwm2Pin, OUTPUT); 
 pinMode(Pwm3Pin, OUTPUT); 
 
- 
-  // Clock
+// RTC Clock setup 
 Wire.begin();
 DS1307.begin();
 //DS1307.adjust(DateTime(__DATE__, __TIME__));  // Set RTC time to sketch compilation time, only use for 1 (ONE) run. Will reset time at each device reset!
+
+//PWM calculations CHannel1
+float IncrementUpPwm1 = (Pwm1EveningEnd - Pwm1EveningStart)/(Pwm1maxInt - Pwm1minInt);
+float IncrementDownPwm1 = (Pwm1MorningEnd - Pwm1MorningStart)/(Pwm1maxInt - Pwm1minInt);
+float pwm1SecFromMorningStart;
+float pwm1SecFromEveningStart;
+int Pwm1Val;
+
+//PWM calculations CHannel2
+float IncrementUpPwm2 = (Pwm2EveningEnd - Pwm2EveningStart)/(Pwm2maxInt - Pwm2minInt);
+float IncrementDownPwm2 = (Pwm2MorningEnd - Pwm2MorningStart)/(Pwm2maxInt - Pwm2minInt);
+float pwm2SecFromMorningStart;
+float pwm2SecFromEveningStart;
+int Pwm2Val;
+
+//PWM calculations CHannel3
+float IncrementUpPwm3 = (Pwm3EveningEnd - Pwm3EveningStart)/(Pwm3maxInt - Pwm3minInt);
+float IncrementDownPwm3 = (Pwm3MorningEnd - Pwm3MorningStart)/(Pwm3maxInt - Pwm3minInt);
+float pwm3SecFromMorningStart;
+float pwm3SecFromEveningStart;
+int Pwm3Val;
+
 }
 
 
@@ -80,21 +94,11 @@ void loop() {
 
     
 // Get current time and calculate totalseconds
-DateTime datetime = DS1307.now();
-hours=(datetime.hour());
-minutes=(datetime.minute());
-seconds=(datetime.second());
-hoursec=hours*60*60L;
-minutesec=minutes*60L;
-secsec=seconds;
-totalsec = (hoursec+minutesec+secsec);
- 
+void CalcSec();
 
-secfromdimstart = totalsec - dimstart;
-secfrommorningstart = totalsec - morningstart;
+// prints values for debugging into serial port
+void PrintSerial();
 
-secfromdimstartPwm3 = totalsec - dimstartPwm3;
-secfrommorningstartPwm3 = totalsec - morningstartPwm3;
 
 delay(delaytime);
 
@@ -109,32 +113,32 @@ if (ledstate < 3){
 
 if (totalsec <= morningstart) {
         ledstate = dimendint;
-        analogWrite(PwmPin, ledstate);
+        analogWrite(Pwm1Pin, ledstate);
         analogWrite(Pwm2Pin, ledstate);  // ledstate2
         }
     
 else if ((morningstart<totalsec)&&(totalsec<morningend)){
         ledstate = (dimendint + (secfrommorningstart/incr));
-        analogWrite(PwmPin, ledstate);
+        analogWrite(Pwm1Pin, ledstate);
         analogWrite(Pwm2Pin, ledstate);  // ledstate2
         }
     
 else if ((morningend <= totalsec)&&(totalsec < dimstart)){
         ledstate = dimstartint;
-        analogWrite(PwmPin, ledstate);
+        analogWrite(Pwm1Pin, ledstate);
         analogWrite(Pwm2Pin, ledstate);  // ledstate2
         }
     
 else if ((dimstart <= totalsec)&&(totalsec <= dimend)){
         ledstate = (dimstartint - (secfromdimstart/incr));
-        analogWrite(PwmPin, ledstate);
+        analogWrite(Pwm1Pin, ledstate);
         analogWrite(Pwm2Pin, ledstate);  // ledstate2
         }
     
 else {
         ledstate = dimendint;
         Serial.println ("to ti nejak nevychadza");
-        analogWrite(PwmPin, ledstate);
+        analogWrite(Pwm1Pin, ledstate);
         analogWrite(Pwm2Pin, ledstate);  // ledstate2
         }
 
@@ -181,19 +185,38 @@ delay(delaytime);
 //---------------------PWM Loop---------------------
 
 
-//Serial.println (hours);
-//Serial.println (minutes);
-//Serial.println (minutesec);
-//Serial.println (seconds);
-//Serial.println ();
-//Serial.println (dimstartint);
-//Serial.println ();
-//Serial.println (ledstate);
-//Serial.println (hoursec);
-//Serial.println (minutesec);
-//Serial.println (secsec);
-//Serial.println (hoursec+minutesec+secsec);
-//Serial.println (totalsec);
-//Serial.println (analogValScaled);
+}
+
+
+void CalcSec(){
+// this function calculates the time in seconds elapsed from midnight 
+DateTime datetime = DS1307.now();
+hours=(datetime.hour());
+minutes=(datetime.minute());
+seconds=(datetime.second());
+hoursec=hours*60*60L;
+minutesec=minutes*60L;
+secsec=seconds;
+totalsec = (hoursec+minutesec+secsec);
+
+pwm1SecFromMorningStart = totalsec - Pwm1MorningStart;
+pwm1SecFromEveningStart = totalsec - Pwm1EveningStart;
+
+pwm2SecFromMorningStart = totalsec - Pwm2MorningStart;
+pwm2SecFromEveningStart = totalsec - Pwm2EveningStart;
+
+pwm3SecFromMorningStart = totalsec - Pwm3MorningStart;
+pwm3SecFromEveningStart = totalsec - Pwm3EveningStart;
+}
+
+
+void PrintSerial() { // prints values for debugging into serial port
+Serial.println (hours);
+Serial.println (minutes);
+Serial.println (seconds);
+Serial.println (totalsec);
+Serial.println (Pwm1Val);
+Serial.println (Pwm2Val);
+Serial.println (Pwm3Val);
 
 }
