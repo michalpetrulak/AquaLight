@@ -22,6 +22,7 @@ long totalsec;
 
 ////////////////////////////PWM////////////////////////////
 // define PWM CHannels min and max intensities (0-255)
+// set this PWM values as desired
 
 int Pwm1maxInt = 160;
 int Pwm1minInt = 2;
@@ -34,6 +35,7 @@ int Pwm3minInt = 2;
 
 
 // define PWM Channels fading times, time is in seconds so just change the hour in 0-24 format
+// Set this times as desired
 
 float Pwm1MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 1 
 float Pwm1MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 1 
@@ -55,21 +57,21 @@ float IncrementUpPwm1 = (Pwm1EveningEnd - Pwm1EveningStart)/(Pwm1maxInt - Pwm1mi
 float IncrementDownPwm1 = (Pwm1MorningEnd - Pwm1MorningStart)/(Pwm1maxInt - Pwm1minInt);
 float pwm1SecFromMorningStart;
 float pwm1SecFromEveningStart;
-int Pwm1Val;
+int Pwm1Val = 5; // some value to inicialize, must be > Pwm1minInt
 
 //PWM calculations CHannel2
 float IncrementUpPwm2 = (Pwm2EveningEnd - Pwm2EveningStart)/(Pwm2maxInt - Pwm2minInt);
 float IncrementDownPwm2 = (Pwm2MorningEnd - Pwm2MorningStart)/(Pwm2maxInt - Pwm2minInt);
 float pwm2SecFromMorningStart;
 float pwm2SecFromEveningStart;
-int Pwm2Val;
+int Pwm2Val = 5; // some value to inicialize, must be > Pwm2minInt
 
 //PWM calculations CHannel3
 float IncrementUpPwm3 = (Pwm3EveningEnd - Pwm3EveningStart)/(Pwm3maxInt - Pwm3minInt);
 float IncrementDownPwm3 = (Pwm3MorningEnd - Pwm3MorningStart)/(Pwm3maxInt - Pwm3minInt);
 float pwm3SecFromMorningStart;
 float pwm3SecFromEveningStart;
-int Pwm3Val;
+int Pwm3Val = 5; // some value to inicialize, must be > Pwm3minInt
 
 // ----------------------- Setup -----------------------
 void setup() {
@@ -96,14 +98,17 @@ void loop() {
 // Get current time and calculate totalseconds
 void CalcSec();
 
-// prints values for debugging into serial port
-void PrintSerial();
-
 void SetPwm1Val();
 
 void SetPwm2Val();
 
 void SetPwm3Val();
+
+analogWrite(Pwm1Pin, Pwm1Val);
+
+analogWrite(Pwm2Pin, Pwm2Val);
+
+analogWrite(Pwm3Pin, Pwm3Val);
 
 void MoonLightPwm1();
 
@@ -111,6 +116,8 @@ void MoonLightPwm2();
 
 void MoonLightPwm3();
 
+// prints values for debugging into serial port
+void PrintSerial();
 
 
 
@@ -160,27 +167,22 @@ void SetPwm1Val(){
   
 if (totalsec <= Pwm1MorningStart) {
         Pwm1Val = Pwm1minInt;
-        analogWrite(Pwm1Pin, Pwm1Val);
         }
     
 else if ((Pwm1MorningStart<totalsec)&&(totalsec<Pwm1MorningEnd)){
         Pwm1Val = (Pwm1minInt + (pwm1SecFromMorningStart/IncrementUpPwm1));
-        analogWrite(Pwm1Pin, Pwm1Val);
         }
     
 else if ((Pwm1MorningEnd <= totalsec)&&(totalsec < Pwm1EveningStart)){
         Pwm1Val = Pwm1maxInt;
-        analogWrite(Pwm1Pin, Pwm1Val);
         }
     
 else if ((Pwm1EveningStart <= totalsec)&&(totalsec <= Pwm1EveningEnd)){
         Pwm1Val = (Pwm1maxInt - (pwm1SecFromEveningStart/IncrementDownPwm1));
-        analogWrite(Pwm1Pin, Pwm1Val);
         }
 
 else {
         Pwm1Val = Pwm1minInt;
-        analogWrite(Pwm1Pin, Pwm1Val);
         }
 
 delay(delaytime);
@@ -193,27 +195,22 @@ void SetPwm2Val(){
   
 if (totalsec <= Pwm2MorningStart) {
         Pwm2Val = Pwm2minInt;
-        analogWrite(Pwm2Pin, Pwm2Val);
         }
     
 else if ((Pwm2MorningStart<totalsec)&&(totalsec<Pwm2MorningEnd)){
         Pwm2Val = (Pwm2minInt + (pwm2SecFromMorningStart/IncrementUpPwm2));
-        analogWrite(Pwm2Pin, Pwm2Val);
         }
     
 else if ((Pwm2MorningEnd <= totalsec)&&(totalsec < Pwm2EveningStart)){
         Pwm2Val = Pwm2maxInt;
-        analogWrite(Pwm2Pin, Pwm2Val);
         }
     
 else if ((Pwm2EveningStart <= totalsec)&&(totalsec <= Pwm2EveningEnd)){
         Pwm2Val = (Pwm2maxInt - (pwm2SecFromEveningStart/IncrementDownPwm2));
-        analogWrite(Pwm2Pin, Pwm2Val);
         }
 
 else {
         Pwm2Val = Pwm2minInt;
-        analogWrite(Pwm2Pin, Pwm2Val);
         }
 
 delay(delaytime);
@@ -226,27 +223,22 @@ void SetPwm3Val(){
   
 if (totalsec <= Pwm3MorningStart) {
         Pwm3Val = Pwm3minInt;
-        analogWrite(Pwm3Pin, Pwm3Val);
         }
     
 else if ((Pwm3MorningStart<totalsec)&&(totalsec<Pwm3MorningEnd)){
         Pwm3Val = (Pwm3minInt + (pwm3SecFromMorningStart/IncrementUpPwm3));
-        analogWrite(Pwm3Pin, Pwm3Val);
         }
     
 else if ((Pwm3MorningEnd <= totalsec)&&(totalsec < Pwm3EveningStart)){
         Pwm3Val = Pwm3maxInt;
-        analogWrite(Pwm3Pin, Pwm3Val);
         }
     
 else if ((Pwm3EveningStart <= totalsec)&&(totalsec <= Pwm3EveningEnd)){
         Pwm3Val = (Pwm3maxInt - (pwm3SecFromEveningStart/IncrementDownPwm3));
-        analogWrite(Pwm3Pin, Pwm3Val);
         }
 
 else {
         Pwm3Val = Pwm3minInt;
-        analogWrite(Pwm3Pin, Pwm3Val);
         }
 
 delay(delaytime);
