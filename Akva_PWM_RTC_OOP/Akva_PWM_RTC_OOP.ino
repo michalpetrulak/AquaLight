@@ -24,51 +24,51 @@ long totalsec;
 // define PWM CHannels min and max intensities (0-255)
 // set this PWM values as desired
 
-int Pwm1maxInt = 150;
+int Pwm1maxInt = 100;
 int Pwm1minInt = 2;
 
-int Pwm2maxInt = 200;
-int Pwm2minInt = 2;
+int Pwm2maxInt = 10;
+int Pwm2minInt = 0;
 
-int Pwm3maxInt = 250;
+int Pwm3maxInt = 160;
 int Pwm3minInt = 2;
 
 
 // define PWM Channels fading times, time is in seconds so just change the hour in 0-24 format
 // Set this times as desired
 
-float Pwm1MorningStart = 8.5*60*60L; // time when the "sunrise starts" for channel 1 
-float Pwm1MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 1 
-float Pwm1EveningStart = 15.0*60*60L; // time when the "sunset starts" for channel 1 
-float Pwm1EveningEnd = 17*60*60L; // time when the "sunset ends" for channel 1 
+float Pwm1MorningStart = 14*60*60L; // time when the "sunrise starts" for channel 1 
+float Pwm1MorningEnd = 14.5*60*60L; // time when the "sunrise ends" for channel 1 
+float Pwm1EveningStart = 22*60*60L; // time when the "sunset starts" for channel 1 
+float Pwm1EveningEnd = 22.5*60*60L; // time when the "sunset ends" for channel 1 
 
-float Pwm2MorningStart = 8.5*60*60L; // time when the "sunrise starts" for channel 2 
-float Pwm2MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 2 
-float Pwm2EveningStart = 15.0*60*60L; // time when the "sunset starts" for channel 2 
-float Pwm2EveningEnd = 17*60*60L; // time when the "sunset ends" for channel 2 
+float Pwm2MorningStart = 18*60*60L; // time when the "sunrise starts" for channel 2 
+float Pwm2MorningEnd = 18.05*60*60L; // time when the "sunrise ends" for channel 2 
+float Pwm2EveningStart = 18.1*60*60L; // time when the "sunset starts" for channel 2 
+float Pwm2EveningEnd = 18.15*60*60L; // time when the "sunset ends" for channel 2 
 
-float Pwm3MorningStart = 8.5*60*60L; // time when the "sunrise starts" for channel 3 
+float Pwm3MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 3 
 float Pwm3MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 3 
-float Pwm3EveningStart = 15.0*60*60L; // time when the "sunset starts" for channel 3 
-float Pwm3EveningEnd = 17*60*60L; // time when the "sunset ends" for channel 3 
+float Pwm3EveningStart = 21*60*60L; // time when the "sunset starts" for channel 3 
+float Pwm3EveningEnd = 22*60*60L; // time when the "sunset ends" for channel 3 
 
 //PWM calculations CHannel1
-float IncrementUpPwm1 = (Pwm1EveningEnd - Pwm1EveningStart)/(Pwm1maxInt - Pwm1minInt);
-float IncrementDownPwm1 = (Pwm1MorningEnd - Pwm1MorningStart)/(Pwm1maxInt - Pwm1minInt);
+float IncrementUpPwm1 = (Pwm1maxInt - Pwm1minInt)/(Pwm1MorningEnd - Pwm1MorningStart);
+float IncrementDownPwm1 = (Pwm1maxInt - Pwm1minInt)/(Pwm1EveningEnd - Pwm1EveningStart);
 float pwm1SecFromMorningStart;
 float pwm1SecFromEveningStart;
 int Pwm1Val = 10; // some value to inicialize, must be > Pwm1minInt
 
 //PWM calculations CHannel2
-float IncrementUpPwm2 = (Pwm2EveningEnd - Pwm2EveningStart)/(Pwm2maxInt - Pwm2minInt);
-float IncrementDownPwm2 = (Pwm2MorningEnd - Pwm2MorningStart)/(Pwm2maxInt - Pwm2minInt);
+float IncrementUpPwm2 = (Pwm2maxInt - Pwm2minInt)/(Pwm2MorningEnd - Pwm2MorningStart);
+float IncrementDownPwm2 = (Pwm2maxInt - Pwm2minInt)/(Pwm2EveningEnd - Pwm2EveningStart);
 float pwm2SecFromMorningStart;
 float pwm2SecFromEveningStart;
 int Pwm2Val = 10; // some value to inicialize, must be > Pwm2minInt
 
 //PWM calculations CHannel3
-float IncrementUpPwm3 = (Pwm3EveningEnd - Pwm3EveningStart)/(Pwm3maxInt - Pwm3minInt);
-float IncrementDownPwm3 = (Pwm3MorningEnd - Pwm3MorningStart)/(Pwm3maxInt - Pwm3minInt);
+float IncrementUpPwm3 = (Pwm3maxInt - Pwm3minInt)/(Pwm3MorningEnd - Pwm3MorningStart);
+float IncrementDownPwm3 = (Pwm3maxInt - Pwm3minInt)/(Pwm3EveningEnd - Pwm3EveningStart);
 float pwm3SecFromMorningStart;
 float pwm3SecFromEveningStart;
 int Pwm3Val = 10; // some value to inicialize, must be > Pwm3minInt
@@ -94,40 +94,25 @@ DS1307.begin();
 // ----------------------- Loop -----------------------
 void loop() {
 
-    
-// Get current time and calculate totalseconds
-void CalcSec();
+CalcSec(); // Get current time and calculate totalseconds
 
-void SetPwm1Val();
+SetPwm1Val();
+SetPwm2Val();
+SetPwm3Val();
 
-void SetPwm2Val();
-
-void SetPwm3Val();
-
-void MoonLightPwm1(); //commend if not desired
-
-void MoonLightPwm2(); //commend if not desired
-
-void MoonLightPwm3(); //commend if not desired
+MoonLightPwm1(); //commend if not desired
+MoonLightPwm2(); //commend if not desired
+MoonLightPwm3(); //commend if not desired
 
 analogWrite(Pwm1Pin, Pwm1Val);
-
 analogWrite(Pwm2Pin, Pwm2Val);
-
 analogWrite(Pwm3Pin, Pwm3Val);
 
-
-// prints values for debugging into serial port
-void PrintSerial();
-
-
-
-//---------------------PWM Loop---------------------
-
+PrintSerial();// prints values for debugging into serial port
 
 }
 
-
+//---------------------function definitions---------------------
 void CalcSec(){
 // this function calculates the time in seconds elapsed from midnight 
 DateTime datetime = DS1307.now();
@@ -170,7 +155,7 @@ Serial.println (Pwm3Val);
 
 
 
-// Channel 1 decision function
+// Channel 1 pwm value decision function
 void SetPwm1Val(){
   
 if (totalsec <= Pwm1MorningStart) {
@@ -178,7 +163,7 @@ if (totalsec <= Pwm1MorningStart) {
         }
     
 else if ((Pwm1MorningStart<totalsec)&&(totalsec<Pwm1MorningEnd)){
-        Pwm1Val = (Pwm1minInt + (pwm1SecFromMorningStart/IncrementUpPwm1));
+        Pwm1Val = (Pwm1minInt + (pwm1SecFromMorningStart*IncrementUpPwm1));
         }
     
 else if ((Pwm1MorningEnd <= totalsec)&&(totalsec < Pwm1EveningStart)){
@@ -186,7 +171,7 @@ else if ((Pwm1MorningEnd <= totalsec)&&(totalsec < Pwm1EveningStart)){
         }
     
 else if ((Pwm1EveningStart <= totalsec)&&(totalsec <= Pwm1EveningEnd)){
-        Pwm1Val = (Pwm1maxInt - (pwm1SecFromEveningStart/IncrementDownPwm1));
+        Pwm1Val = (Pwm1maxInt - (pwm1SecFromEveningStart*IncrementDownPwm1));
         }
 
 else {
@@ -198,7 +183,7 @@ delay(delaytime);
   }
 
   
-// Channel 2 decision function
+// Channel 2 pwm value decision function
 void SetPwm2Val(){
   
 if (totalsec <= Pwm2MorningStart) {
@@ -206,7 +191,7 @@ if (totalsec <= Pwm2MorningStart) {
         }
     
 else if ((Pwm2MorningStart<totalsec)&&(totalsec<Pwm2MorningEnd)){
-        Pwm2Val = (Pwm2minInt + (pwm2SecFromMorningStart/IncrementUpPwm2));
+        Pwm2Val = (Pwm2minInt + (pwm2SecFromMorningStart*IncrementUpPwm2));
         }
     
 else if ((Pwm2MorningEnd <= totalsec)&&(totalsec < Pwm2EveningStart)){
@@ -214,7 +199,7 @@ else if ((Pwm2MorningEnd <= totalsec)&&(totalsec < Pwm2EveningStart)){
         }
     
 else if ((Pwm2EveningStart <= totalsec)&&(totalsec <= Pwm2EveningEnd)){
-        Pwm2Val = (Pwm2maxInt - (pwm2SecFromEveningStart/IncrementDownPwm2));
+        Pwm2Val = (Pwm2maxInt - (pwm2SecFromEveningStart*IncrementDownPwm2));
         }
 
 else {
@@ -226,7 +211,7 @@ delay(delaytime);
   }
 
 
-// Channel 3 decision function
+// Channel 3 pwm value decision function
 void SetPwm3Val(){
   
 if (totalsec <= Pwm3MorningStart) {
@@ -234,7 +219,7 @@ if (totalsec <= Pwm3MorningStart) {
         }
     
 else if ((Pwm3MorningStart<totalsec)&&(totalsec<Pwm3MorningEnd)){
-        Pwm3Val = (Pwm3minInt + (pwm3SecFromMorningStart/IncrementUpPwm3));
+        Pwm3Val = (Pwm3minInt + (pwm3SecFromMorningStart*IncrementUpPwm3));
         }
     
 else if ((Pwm3MorningEnd <= totalsec)&&(totalsec < Pwm3EveningStart)){
@@ -242,7 +227,7 @@ else if ((Pwm3MorningEnd <= totalsec)&&(totalsec < Pwm3EveningStart)){
         }
     
 else if ((Pwm3EveningStart <= totalsec)&&(totalsec <= Pwm3EveningEnd)){
-        Pwm3Val = (Pwm3maxInt - (pwm3SecFromEveningStart/IncrementDownPwm3));
+        Pwm3Val = (Pwm3maxInt - (pwm3SecFromEveningStart*IncrementDownPwm3));
         }
 
 else {
@@ -253,7 +238,9 @@ delay(delaytime);
   
   }
 
-void MoonLightPwm1(){
+void MoonLightPwm1(){ //This function is due to PWM value 1 which is for some reason
+                      //behaving like "high" and therfore the mosfet fully opens 
+                      //(same as if it would be pwm 255)
 
   if (Pwm1Val < 2){
         Pwm1Val = 0;
