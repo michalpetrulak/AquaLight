@@ -24,54 +24,54 @@ long totalsec;
 // define PWM CHannels min and max intensities (0-255)
 // set this PWM values as desired
 
-int Pwm1maxInt = 160;
+int Pwm1maxInt = 150;
 int Pwm1minInt = 2;
 
-int Pwm2maxInt = 160;
+int Pwm2maxInt = 200;
 int Pwm2minInt = 2;
 
-int Pwm3maxInt = 160;
+int Pwm3maxInt = 250;
 int Pwm3minInt = 2;
 
 
 // define PWM Channels fading times, time is in seconds so just change the hour in 0-24 format
 // Set this times as desired
 
-float Pwm1MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 1 
+float Pwm1MorningStart = 8.5*60*60L; // time when the "sunrise starts" for channel 1 
 float Pwm1MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 1 
-float Pwm1EveningStart = 21.0*60*60L; // time when the "sunset starts" for channel 1 
-float Pwm1EveningEnd = 22*60*60L; // time when the "sunset ends" for channel 1 
+float Pwm1EveningStart = 15.0*60*60L; // time when the "sunset starts" for channel 1 
+float Pwm1EveningEnd = 17*60*60L; // time when the "sunset ends" for channel 1 
 
-float Pwm2MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 2 
+float Pwm2MorningStart = 8.5*60*60L; // time when the "sunrise starts" for channel 2 
 float Pwm2MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 2 
-float Pwm2EveningStart = 21.0*60*60L; // time when the "sunset starts" for channel 2 
-float Pwm2EveningEnd = 22*60*60L; // time when the "sunset ends" for channel 2 
+float Pwm2EveningStart = 15.0*60*60L; // time when the "sunset starts" for channel 2 
+float Pwm2EveningEnd = 17*60*60L; // time when the "sunset ends" for channel 2 
 
-float Pwm3MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 3 
+float Pwm3MorningStart = 8.5*60*60L; // time when the "sunrise starts" for channel 3 
 float Pwm3MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 3 
-float Pwm3EveningStart = 21.0*60*60L; // time when the "sunset starts" for channel 3 
-float Pwm3EveningEnd = 22*60*60L; // time when the "sunset ends" for channel 3 
+float Pwm3EveningStart = 15.0*60*60L; // time when the "sunset starts" for channel 3 
+float Pwm3EveningEnd = 17*60*60L; // time when the "sunset ends" for channel 3 
 
 //PWM calculations CHannel1
 float IncrementUpPwm1 = (Pwm1EveningEnd - Pwm1EveningStart)/(Pwm1maxInt - Pwm1minInt);
 float IncrementDownPwm1 = (Pwm1MorningEnd - Pwm1MorningStart)/(Pwm1maxInt - Pwm1minInt);
 float pwm1SecFromMorningStart;
 float pwm1SecFromEveningStart;
-int Pwm1Val = 5; // some value to inicialize, must be > Pwm1minInt
+int Pwm1Val = 10; // some value to inicialize, must be > Pwm1minInt
 
 //PWM calculations CHannel2
 float IncrementUpPwm2 = (Pwm2EveningEnd - Pwm2EveningStart)/(Pwm2maxInt - Pwm2minInt);
 float IncrementDownPwm2 = (Pwm2MorningEnd - Pwm2MorningStart)/(Pwm2maxInt - Pwm2minInt);
 float pwm2SecFromMorningStart;
 float pwm2SecFromEveningStart;
-int Pwm2Val = 5; // some value to inicialize, must be > Pwm2minInt
+int Pwm2Val = 10; // some value to inicialize, must be > Pwm2minInt
 
 //PWM calculations CHannel3
 float IncrementUpPwm3 = (Pwm3EveningEnd - Pwm3EveningStart)/(Pwm3maxInt - Pwm3minInt);
 float IncrementDownPwm3 = (Pwm3MorningEnd - Pwm3MorningStart)/(Pwm3maxInt - Pwm3minInt);
 float pwm3SecFromMorningStart;
 float pwm3SecFromEveningStart;
-int Pwm3Val = 5; // some value to inicialize, must be > Pwm3minInt
+int Pwm3Val = 10; // some value to inicialize, must be > Pwm3minInt
 
 // ----------------------- Setup -----------------------
 void setup() {
@@ -104,17 +104,18 @@ void SetPwm2Val();
 
 void SetPwm3Val();
 
+void MoonLightPwm1(); //commend if not desired
+
+void MoonLightPwm2(); //commend if not desired
+
+void MoonLightPwm3(); //commend if not desired
+
 analogWrite(Pwm1Pin, Pwm1Val);
 
 analogWrite(Pwm2Pin, Pwm2Val);
 
 analogWrite(Pwm3Pin, Pwm3Val);
 
-void MoonLightPwm1();
-
-void MoonLightPwm2();
-
-void MoonLightPwm3();
 
 // prints values for debugging into serial port
 void PrintSerial();
@@ -150,12 +151,19 @@ pwm3SecFromEveningStart = totalsec - Pwm3EveningStart;
 
 
 void PrintSerial() { // prints values for debugging into serial port
+Serial.print ("hours: ");
 Serial.println (hours);
+Serial.print ("minuts: ");
 Serial.println (minutes);
+Serial.print ("seconds: ");
 Serial.println (seconds);
+Serial.print ("totalseconds: ");
 Serial.println (totalsec);
+Serial.print ("Channel 1 value: ");
 Serial.println (Pwm1Val);
+Serial.print ("Channel 2 value: ");
 Serial.println (Pwm2Val);
+Serial.print ("Channel 3 value: ");
 Serial.println (Pwm3Val);
 
 }
