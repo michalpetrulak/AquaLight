@@ -1,3 +1,5 @@
+// Code for MOSFET driven 3 channel aquarium light (or basically anythin else) based on RTC clock
+// by Michal Petrulak 
 
 #include <Wire.h>
 #include "RTClib.h"
@@ -20,15 +22,17 @@ long minutesec;
 long secsec;
 long totalsec;
 
-////////////////////////////PWM////////////////////////////
+
+// ----------------------- PWM settings -----------------------
 // define PWM CHannels min and max intensities (0-255)
-// set this PWM values as desired
+// PwmMax value can NOT be 0
+// set the PWM values as desired to achieve sufficient light intensity
 
 int Pwm1maxInt = 100;
 int Pwm1minInt = 2;
 
 int Pwm2maxInt = 10;
-int Pwm2minInt = 0;
+int Pwm2minInt = 10;
 
 int Pwm3maxInt = 160;
 int Pwm3minInt = 2;
@@ -43,9 +47,9 @@ float Pwm1EveningStart = 22*60*60L; // time when the "sunset starts" for channel
 float Pwm1EveningEnd = 22.5*60*60L; // time when the "sunset ends" for channel 1 
 
 float Pwm2MorningStart = 18*60*60L; // time when the "sunrise starts" for channel 2 
-float Pwm2MorningEnd = 18.05*60*60L; // time when the "sunrise ends" for channel 2 
-float Pwm2EveningStart = 18.1*60*60L; // time when the "sunset starts" for channel 2 
-float Pwm2EveningEnd = 18.15*60*60L; // time when the "sunset ends" for channel 2 
+float Pwm2MorningEnd = 19*60*60L; // time when the "sunrise ends" for channel 2 
+float Pwm2EveningStart = 20*60*60L; // time when the "sunset starts" for channel 2 
+float Pwm2EveningEnd = 21*60*60L; // time when the "sunset ends" for channel 2 
 
 float Pwm3MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 3 
 float Pwm3MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 3 
@@ -86,8 +90,8 @@ pinMode(Pwm3Pin, OUTPUT);
 // RTC Clock setup 
 Wire.begin();
 DS1307.begin();
-//DS1307.adjust(DateTime(__DATE__, __TIME__));  // Set RTC time to sketch compilation time, only use for 1 (ONE) run. Will reset time at each device reset!
-
+//DS1307.adjust(DateTime(__DATE__, __TIME__));  //Set RTC time to sketch compilation time, only use for 1 (ONE) run.
+                                                //otherwise it will reset time at each device reset!
 }
 
 
@@ -96,25 +100,27 @@ void loop() {
 
 CalcSec(); // Get current time and calculate totalseconds
 
-SetPwm1Val();
-SetPwm2Val();
-SetPwm3Val();
+SetPwm1Val(); //calculates the PWM channel 1 value
+SetPwm2Val(); //calculates the PWM channel 2 value
+SetPwm3Val(); //calculates the PWM channel 3 value
 
 MoonLightPwm1(); //commend if not desired
 MoonLightPwm2(); //commend if not desired
 MoonLightPwm3(); //commend if not desired
 
-analogWrite(Pwm1Pin, Pwm1Val);
-analogWrite(Pwm2Pin, Pwm2Val);
-analogWrite(Pwm3Pin, Pwm3Val);
+analogWrite(Pwm1Pin, Pwm1Val); //commend to "turn off" channel
+analogWrite(Pwm2Pin, Pwm2Val); //commend to "turn off" channel
+analogWrite(Pwm3Pin, Pwm3Val); //commend to "turn off" channel
 
-PrintSerial();// prints values for debugging into serial port
+//PrintSerial();// prints values for debugging into serial port
 
 }
 
 //---------------------function definitions---------------------
 void CalcSec(){
-// this function calculates the time in seconds elapsed from midnight 
+// this function calculates the time in seconds elapsed from midnight
+// and also seconds from the morning and evening start
+
 DateTime datetime = DS1307.now();
 hours=(datetime.hour());
 minutes=(datetime.minute());
