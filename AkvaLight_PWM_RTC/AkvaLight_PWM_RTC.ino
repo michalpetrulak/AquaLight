@@ -8,7 +8,7 @@ DateTime CurrentTime;
 
 // define pins for output
 const int Pwm1Pin = 9;  //pwm pin for channel 1 
-const int Pwm2Pin = 10; //pwm pin for channel 2
+const int Pwm2Pin = 5; //pwm pin for channel 2
 const int Pwm3Pin = 11; //pwm pin for channel 3
 
 int delaytime = 500;
@@ -28,14 +28,14 @@ long totalsec;
 // PwmMax value can NOT be 0
 // set the PWM values as desired to achieve sufficient light intensity
 
-int Pwm1maxInt = 100;
-int Pwm1minInt = 2;
+int Pwm1maxInt = 120; // 100
+int Pwm1minInt = 2; // 2
 
-int Pwm2maxInt = 10;
-int Pwm2minInt = 10;
+int Pwm2maxInt = 255;
+int Pwm2minInt = 0; // 0
 
-int Pwm3maxInt = 160;
-int Pwm3minInt = 2;
+int Pwm3maxInt = 160;  // 160
+int Pwm3minInt = 2;  //2
 
 
 // define PWM Channels fading times, time is in seconds so just change the hour in 0-24 format
@@ -46,10 +46,10 @@ float Pwm1MorningEnd = 14.5*60*60L; // time when the "sunrise ends" for channel 
 float Pwm1EveningStart = 22*60*60L; // time when the "sunset starts" for channel 1 
 float Pwm1EveningEnd = 22.5*60*60L; // time when the "sunset ends" for channel 1 
 
-float Pwm2MorningStart = 18*60*60L; // time when the "sunrise starts" for channel 2 
-float Pwm2MorningEnd = 19*60*60L; // time when the "sunrise ends" for channel 2 
-float Pwm2EveningStart = 20*60*60L; // time when the "sunset starts" for channel 2 
-float Pwm2EveningEnd = 21*60*60L; // time when the "sunset ends" for channel 2 
+float Pwm2MorningStart = 7*60*60L; // time when the "sunrise starts" for channel 2 
+float Pwm2MorningEnd = 8*60*60L; // time when the "sunrise ends" for channel 2 
+float Pwm2EveningStart = 14*60*60L; // time when the "sunset starts" for channel 2 
+float Pwm2EveningEnd = 15*60*60L; // time when the "sunset ends" for channel 2 
 
 float Pwm3MorningStart = 11.5*60*60L; // time when the "sunrise starts" for channel 3 
 float Pwm3MorningEnd = 12.5*60*60L; // time when the "sunrise ends" for channel 3 
@@ -112,7 +112,7 @@ analogWrite(Pwm1Pin, Pwm1Val); //commend to "turn off" channel
 analogWrite(Pwm2Pin, Pwm2Val); //commend to "turn off" channel
 analogWrite(Pwm3Pin, Pwm3Val); //commend to "turn off" channel
 
-//PrintSerial();// prints values for debugging into serial port
+// PrintSerial();// prints values for debugging into serial port
 
 }
 
@@ -258,7 +258,7 @@ void MoonLightPwm1(){ //This function is due to PWM value 1 which is for some re
 void MoonLightPwm2(){
 
   if (Pwm2Val < 2){
-        Pwm1Val = 0;
+        Pwm2Val = 0;
         analogWrite(Pwm2Pin, Pwm2Val);
         }
   
